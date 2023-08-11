@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: To create VPC with subnetes, internet gateway and Route table
+Resources:
+  MyVpc:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: 'true'
+      Tags: 
+      - Key: "stack"
+        Value: "Production"
+      - Key: "Name"
+        Value: "VPC-01"
+  MySubnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      AvailabilityZone: "ap-south-1b"
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: 'true'
+      Tags: 
+      - Key: "stack"
+        Value: "Production"
+      - Key: "Name"
+        Value: "Public-01"
+      VpcId: !Ref MyVpc
+  MyPrivateSubnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      AvailabilityZone: "ap-south-1b"
+      CidrBlock: 10.0.3.0/24
+      MapPublicIpOnLaunch: 'false'
+      Tags:
+      - Key: "stack"
+        Value: "Production"
+      - Key: "Name"
+        Value: "Private-01"
+      VpcId: !Ref MyVpc
+  MyPublicRoute:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId:
+        Ref: MyVpc
+      Tags: 
+      - Key: "stack"
+        Value: "Production"
+      - Key: "Name"
+        Value: "PublicRoutetable"
+  MyPrivateRoute:
+    Type: 'AWS::EC2::RouteTable'
+    Properties: 
+      VpcId: !Ref MyVpc
+      Tags:
+      - Key: "stack"
+        Value: "Production"
+      - Key: "Name"
+        Value: "PrivateRoutetable"
+  MyPublicSubnetRouteAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref MyPublicRoute
+      SubnetId: !Ref MySubnet
+  MyPrivateSubnetRouteAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref MyPrivateRoute
+      SubnetId: !Ref MyPrivateSubnet
